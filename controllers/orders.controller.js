@@ -312,20 +312,25 @@ export const getOrderIdWithUnitIdUpdated = async (req, res, next) => {
         const [orderData, updateOrderItems, orderHistory, orderStatuses] = await Promise.all([orderModel, itemsModel, historyModel, statusModel]);
         // console.log(orderData, updateOrderItems, orderHistory, orderStatuses);
         let orderUpdatedStatus = [];
-        const updatedOrderStatus = orderStatuses.forEach(status => {
+        let currentOrderStatus = updateOrderItems[0].orderStatus;
+        orderStatuses.forEach(status => {
             let isCompletedStatus = orderHistory.findIndex((h) => h.orderStatus._id === status._id);
             if (isCompletedStatus >= 0) {
-                // return { status, isCompletedStatus: true, history: orderHistory[isCompletedStatus] };
                 orderUpdatedStatus.push({ status, isCompletedStatus: true, history: orderHistory[isCompletedStatus] })
-            } else if (updateOrderItems[0].orderStatus._id !== "cancelled") {
-                // return { status, isCompletedStatus: false };
+            }
+            else if (status.statusOrder <= 6 && currentOrderStatus._id !== "cancelled") {
+                orderUpdatedStatus.push({ status, isCompletedStatus: false })
+            }
+            else if (status._id !== "cancelled" && status.statusOrder > 6 && currentOrderStatus.statusOrder > 6) {
+                orderUpdatedStatus.push({ status, isCompletedStatus: false })
+            }
+            else if (currentOrderStatus._id === "cancelled" && status._id === "cancelled") {
                 orderUpdatedStatus.push({ status, isCompletedStatus: false })
             }
         });
-        console.log("order-status", updateOrderItems[0].orderStatus)
         const orderedItem = updateOrderItems[0];
 
-        return next(createSuccess(200, '', { orderData, orderedItem, orderUpdatedStatus }))
+        return next(createSuccess(200, '', { orderData, orderedItem, updatedOrderStatus: orderUpdatedStatus }))
     } catch (error) {
         console.log("Error", error)
         return next(createError(500, error))
@@ -333,12 +338,7 @@ export const getOrderIdWithUnitIdUpdated = async (req, res, next) => {
 }
 
 const displayAllOrderStatus = async (isReturnedOrder) => {
-    const orderStatus = await orderStatusModel.find({}, null, { sort: { statusOrder: 1 } }).select("statusComments statusText returnStatus");
-    if (!isReturnedOrder) {
-        const updatedOrderStatus = orderStatus.filter(status => !status.returnStatus);
-        return updatedOrderStatus;
-    }
-    console.log("order-status", orderStatus)
+    const orderStatus = await orderStatusModel.find({}, null, { sort: { statusOrder: 1 } }).select("statusComments statusText returnStatus statusOrder");
     return orderStatus;
 }
 

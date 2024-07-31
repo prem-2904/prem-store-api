@@ -10,12 +10,13 @@ import wishlistRouter from './routes/wishlist.route.js';
 import orderRoutes from './routes/order.route.js';
 import orderStatusModel from './models/orders/order.status.model.js';
 import { ORDERSTATUS } from './models/orders/order-status.js';
+import { whiteListUrls } from './utils/whitelist-urls.js';
 dotenv.config();
 connectToMongoDB();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ credentials: true, origin: ['http://localhost:4200', 'http://localhost:4500'] }));
+app.use(cors({ credentials: true, origin: whiteListUrls }));
 app.use(cookieParser());
 
 app.use('/api/product', productRouter);

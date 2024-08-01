@@ -196,3 +196,14 @@ export const updateStocksOnOrder = async (stockDetails) => {
         { $new: true }
     )
 }
+
+export const searchProducts = async (req, res, next) => {
+    try {
+        const filterKey = new RegExp(req.query.search, 'i');
+        const searchData = await productsModel.find({ productName: filterKey }).populate("availabilityStocks")
+            .populate({ path: "sellerId", select: "sellerName" });
+        return next(createSuccess(200, [], searchData));
+    } catch (error) {
+        return next(createError(500, 'Something went wrong' + error));
+    }
+}

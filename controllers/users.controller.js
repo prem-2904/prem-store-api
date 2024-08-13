@@ -11,9 +11,9 @@ export const createUserAccount = async (req, res, next) => {
             fullName: req.body.fullName,
             email: req.body.email,
             password: encryptedPassword,
-            accountMode: req.body.accountMode,
+            accountMode: req.body?.accountMode,
             isDeleted: false,
-            profilePicture: req.body.profilePicture
+            profilePicture: req.body?.profilePicture
         });
 
         await userDetails.save();

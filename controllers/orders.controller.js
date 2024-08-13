@@ -366,7 +366,7 @@ export const cancelOrder = async (req, res, next) => {
     try {
         const orderId = req.body.orderId;
         if (orderId) {
-            const item = await orderItemsModel.updateOne({ orderId: orderId }, { orderStatus: 'cancelled' });
+            const item = await orderItemsModel.updateOne({ orderId: orderId }, { orderStatus: 'cancelled', isCancelled: true });
 
             const historyPayload = {
                 orderId: orderId,

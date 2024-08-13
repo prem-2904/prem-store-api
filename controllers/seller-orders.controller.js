@@ -49,8 +49,17 @@ export const updateOrderStatus = async (req, res, next) => {
                 "orderAmountPaid": req.body?.orderAmountPaid
             }
         }
-
-        const itemsUpdateRes = await orderItemsModel.updateOne({ orderId: payload.id }, { orderStatus: payload.order.orderStatus });
+        const itemPayload = {};
+        itemPayload['ordetStatus'] = payload.order.orderStatus;
+        if (updateOrderStatus._id === 'delivered') {
+            itemPayload['isOrderCompleted'] = true;
+        } else if (updateOrderStatus._id === 'refunded') {
+            itemPayload['isReturned'] = true;
+        } else if (updateOrderStatus._id === 'cancelled') {
+            itemPayload['isCancelled'] = true;
+        }
+        console.log("Order-status", itemPayload);
+        const itemsUpdateRes = await orderItemsModel.updateOne({ orderId: payload.id }, itemPayload);
         const historyPayload = {
             orderId: payload.id,
             orderStatus: payload.orderHistory.nextStatus,

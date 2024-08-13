@@ -138,3 +138,13 @@ export const validateStocksForCartItems = async (req, res, next) => {
         return next(createError(500, 'Something went wrong' + error))
     }
 }
+
+
+export const updateCartItemQuantity = async (req, res, next) => {
+    try {
+        await cartModel.findByIdAndUpdate(req.body.id, { quantity: req.body.quantity });
+        return next(createSuccess(200, 'Cart quantity updated!'));
+    } catch (error) {
+        return next(createError(500, 'Something went wrong' + error))
+    }
+}

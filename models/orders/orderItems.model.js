@@ -43,6 +43,16 @@ const orderItemsSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
             required: true
+        },
+        isReturned: {
+            type: Boolean,
+            default: false,
+            required: true
+        },
+        isCancelled: {
+            type: Boolean,
+            default: false,
+            required: true
         }
     },
     {

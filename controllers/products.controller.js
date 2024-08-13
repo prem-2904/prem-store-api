@@ -2,6 +2,7 @@ import productStocksModel from "../models/product-stocks.model.js";
 import productsModel from "../models/products.model.js";
 import { createError, createSuccess } from "../utils/response-structure.js";
 import stocksModel from '../models/product-stocks.model.js'
+import cartModel from "../models/cart.model.js";
 
 export const createProduct = async (req, res, next) => {
     try {
@@ -90,6 +91,7 @@ export const getProducts = async (req, res, next) => {
         }
         const products = await productsModel.find(params).populate("availabilityStocks")
             .populate({ path: "sellerId", select: "sellerName" });
+        console.log('products', products);
         if (products) {
             return next(createSuccess(200, '', products));
         }
@@ -131,7 +133,10 @@ export const getStocks = async (req, res, next) => {
 
 export const userProducts = async (req, res, next) => {
     try {
-        const products = await productsModel.find({ isAvailableForSale: true }).populate("availabilityStocks").populate('sellerId');
+        const products = await productsModel.find({ isAvailableForSale: true })
+            .populate("availabilityStocks")
+            .populate({ path: 'sellerId', select: "sellerName" });
+        console.log('products', products[0].availabilityStocks);
         if (products) {
             return next(createSuccess(200, '', products));
         }
@@ -179,12 +184,18 @@ export const updateStocksOnOrder = async (stockDetails) => {
         return next(createError(404, 'No items found to update'));
     }
     let existingStockCount = stock?.addedStockNos;
+    let orderedQuantity = stockDetails.orderedQuantity;
     let updatedStockCount = 0;
-    if (stockDetails?.removeStock) {
-        updatedStockCount = existingStockCount - stockDetails.orderedQuantity;
+    if (existingStockCount < orderedQuantity) {
+        let quan = orderedQuantity - existingStockCount;
+        console.log("quan", quan)
+        return next(createError(403, `Available quantity:${quan}`))
+    }
+    else if (stockDetails?.removeStock) {
+        updatedStockCount = existingStockCount - orderedQuantity;
     }
     else {
-        updatedStockCount = existingStockCount + stockDetails.orderedQuantity;
+        updatedStockCount = existingStockCount + orderedQuantity;
     }
     const payload = {
         addedStockNos: updatedStockCount
@@ -205,5 +216,32 @@ export const searchProducts = async (req, res, next) => {
         return next(createSuccess(200, [], searchData));
     } catch (error) {
         return next(createError(500, 'Something went wrong' + error));
+    }
+}
+
+
+export const validateStocksBeforeCheckout = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const availableStocks = {};
+        const cartDetails = await cartModel.find({ userId: userId, isDeleted: false });
+        if (cartDetails.length > 0) {
+            let isGoodToCheckout = 0;
+            for (let index = 0; index < cartDetails.length; index++) {
+                const element = await stocksModel.find({ productId: cartDetails[index].itemId });
+                console.log(element[0].addedStockNos)
+                if (element[0].addedStockNos < cartDetails[index].quantity) {
+                    availableStocks[cartDetails[index]._id] = { isGood: false, availableQuan: element[0].addedStockNos - cartDetails[index].quantity };
+                } else {
+                    isGoodToCheckout++;
+                    availableStocks[cartDetails[index]._id] = { isGood: true };
+                }
+            }
+            return next(createSuccess(201, '', { isGoodToCheckout: isGoodToCheckout === cartDetails.length, availableStocks }));
+        } else {
+            return next(createError(404, 'No cart items!!'));
+        }
+    } catch (error) {
+        return next(createError(500, 'Something went wrong!' + error));
     }
 }

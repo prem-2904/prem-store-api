@@ -16,3 +16,12 @@ export const generateToken = (data, res) => {
         console.log("Generate Token", error);
     }
 }
+
+export const decodeToken = (data) => {
+    try {
+        const decodedData = jwt.decode(data);
+        return decodedData;
+    } catch (error) {
+        console.log("issue with decode", error);
+    }
+}

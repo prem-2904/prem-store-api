@@ -18,7 +18,6 @@ export const getSellerOrders = async (req, res, next) => {
 
         return next(createSuccess(200, '', orders))
     } catch (error) {
-        console.log("err-seller-order", error);
         return next(createError(500, 'Something went wrong' + error))
     }
 }
@@ -58,7 +57,6 @@ export const updateOrderStatus = async (req, res, next) => {
         } else if (updateOrderStatus._id === 'cancelled') {
             itemPayload['isCancelled'] = true;
         }
-        console.log("Order-status", itemPayload);
         const itemsUpdateRes = await orderItemsModel.updateOne({ orderId: payload.id }, itemPayload);
         const historyPayload = {
             orderId: payload.id,

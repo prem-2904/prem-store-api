@@ -132,7 +132,6 @@ export const createTransactionAndOrderDetails = async (req, res, next) => {
 // Function to generate custom _id
 const generateOrderId = async () => {
     const lastOrder = await ordersModel.findOne({}, null, { sort: { _id: -1 } });
-    console.log("lastorser", lastOrder?._id)
     let newId = 'OD00000001';
 
     if (lastOrder) {
@@ -140,7 +139,6 @@ const generateOrderId = async () => {
         const lastNum = parseInt(lastId.slice(5), 10);
         const newNum = lastNum + 1;
         newId = `OD${newNum.toString().padStart(8, '0')}`;
-        console.log("newId", newId)
     }
 
     return newId;
@@ -200,7 +198,6 @@ export const createOrderWithDelivery = async (req, res, next) => {
             const orderHistory = new orderHistoryModel(historyPayload);
             orderDetails.orderHistory.push(orderHistory);
             // await orderHistory.save();
-            console.log("payloads-order-history", orderHistory);
             await Promise.all([orderItemsSave.save(), orders.save(), orderHistory.save()]);
 
             const cartId = await cartModel.findById({ _id: orderItems[i].cartId });
@@ -220,7 +217,6 @@ export const createOrderWithDelivery = async (req, res, next) => {
 
         return next(createSuccess(201, 'Order created successfully', orderDetails))
     } catch (error) {
-        console.log("Error", error)
         return next(createError(500, error, []))
     }
 }
@@ -244,7 +240,6 @@ export const getUsersOrder = async (req, res, next) => {
             .sort({ "_id": -1 });
         return next(createSuccess(200, '', orders))
     } catch (error) {
-        console.log(error, 'users-order-error')
         return next(createError(500, error))
     }
 }
@@ -287,7 +282,6 @@ export const getOrderIdWithUnitId = async (req, res, next) => {
                 ]
             })
             .populate({ path: "orderHistory", select: "orderStatus createdAt", populate: { path: "orderStatus", select: "statusText statusComments" } })
-        console.log("orders", orders);
         return next(createSuccess(200, '', orders))
     } catch (error) {
         return next(createError(500, error))
@@ -310,7 +304,7 @@ export const getOrderIdWithUnitIdUpdated = async (req, res, next) => {
         const statusModel = displayAllOrderStatus(false);
 
         const [orderData, updateOrderItems, orderHistory, orderStatuses] = await Promise.all([orderModel, itemsModel, historyModel, statusModel]);
-        // console.log(orderData, updateOrderItems, orderHistory, orderStatuses);
+        // (orderData, updateOrderItems, orderHistory, orderStatuses);
         let orderUpdatedStatus = [];
         let currentOrderStatus = updateOrderItems[0].orderStatus;
         orderStatuses.forEach(status => {

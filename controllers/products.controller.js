@@ -32,7 +32,6 @@ export const updateProduct = async (req, res, next) => {
         if (product) {
             if (req.body.fieldUpdate == 'isAvailableForSale' && req.body.isAvailableForSale) {
                 const stocks = await productStocksModel.find({ productId: productId });
-                console.log("sotckt", stocks);
                 if (!stocks.length) {
                     return next(createError(400, 'Oops! No stocks added to this product! Please add stocks to release your product to public sale!'))
                 }
@@ -91,7 +90,6 @@ export const getProducts = async (req, res, next) => {
         }
         const products = await productsModel.find(params).populate("availabilityStocks")
             .populate({ path: "sellerId", select: "sellerName" });
-        console.log('products', products);
         if (products) {
             return next(createSuccess(200, '', products));
         }
@@ -136,7 +134,6 @@ export const userProducts = async (req, res, next) => {
         const products = await productsModel.find({ isAvailableForSale: true })
             .populate("availabilityStocks")
             .populate({ path: 'sellerId', select: "sellerName" });
-        console.log('products', products[0].availabilityStocks);
         if (products) {
             return next(createSuccess(200, '', products));
         }
@@ -188,7 +185,6 @@ export const updateStocksOnOrder = async (stockDetails) => {
     let updatedStockCount = 0;
     if (existingStockCount < orderedQuantity) {
         let quan = orderedQuantity - existingStockCount;
-        console.log("quan", quan)
         return next(createError(403, `Available quantity:${quan}`))
     }
     else if (stockDetails?.removeStock) {
@@ -229,7 +225,6 @@ export const validateStocksBeforeCheckout = async (req, res, next) => {
             let isGoodToCheckout = 0;
             for (let index = 0; index < cartDetails.length; index++) {
                 const element = await stocksModel.find({ productId: cartDetails[index].itemId });
-                console.log(element[0].addedStockNos)
                 if (element[0].addedStockNos < cartDetails[index].quantity) {
                     availableStocks[cartDetails[index]._id] = { isGood: false, availableQuan: element[0].addedStockNos - cartDetails[index].quantity };
                 } else {

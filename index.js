@@ -11,6 +11,7 @@ import orderRoutes from './routes/order.route.js';
 import orderStatusModel from './models/orders/order.status.model.js';
 import { ORDERSTATUS } from './models/orders/order-status.js';
 import { whiteListUrls } from './utils/whitelist-urls.js';
+import dashboardRoutes from './routes/dashboard.route.js';
 dotenv.config();
 connectToMongoDB();
 
@@ -24,6 +25,7 @@ app.use('/api/seller', sellerRouter);
 app.use('/api/users', userRouter);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/order', orderRoutes);
+app.use('/api/stats', dashboardRoutes);
 
 app.use((err, req, res, next) => {
     const statusCode = err?.status || 500;

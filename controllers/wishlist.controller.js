@@ -103,6 +103,7 @@ export const getUserCart = async (req, res, next) => {
                     path: 'itemId',
                     populate: { path: 'availabilityStocks', model: "product-stocks" }
                 })
+            .populate({ path: 'offers', match: { dateOfExpiry: { $gte: new Date() } }, select: "couponName couponCode couponOfferType couponTerms dateOfExpiry minPurchase" });
         return next(createSuccess(200, '', cart));
     } catch (error) {
         return next(createError(500, 'Something went wrong' + error))

@@ -41,4 +41,11 @@ export const addToCartSchema = new mongoose.Schema(
 //     select: 'stocksAvailability stockFilledDate expirationDate'
 // });
 
+
+addToCartSchema.virtual('offers', {
+    ref: 'offers',
+    localField: 'itemId',
+    foreignField: "productId"
+})
+
 export default mongoose.model("cart", addToCartSchema);

@@ -73,9 +73,10 @@ export const createTransactionAndOrderDetails = async (req, res, next) => {
             // updatedBy: order?.updatedBy,
             orderAmountPaid: order?.orderAmountPaid,
             orderItems: [],
-            orderHistory: []
+            orderHistory: [],
+            offerDetails: order?.offers
         };
-
+        console.log("order-payload", orderDetails)
         const orderItems = req.body.orderItems;
         const updateOrderItems = {
             orderItems: [],
@@ -165,9 +166,10 @@ export const createOrderWithDelivery = async (req, res, next) => {
             orderedBy: order?.orderedBy,
             orderAmountPaid: order?.orderAmountPaid,
             orderItems: "",
-            orderHistory: []
+            orderHistory: [],
+            offerDetails: order?.offers
         };
-
+        console.log("order-details", orderDetails)
         const orderItems = req.body.orderItems;
         for (let i = 0; i < orderItems.length; i++) {
             let newOrderId = await generateOrderId();

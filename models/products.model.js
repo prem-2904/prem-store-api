@@ -35,9 +35,17 @@ const productSchema = new Schema(
         }]
     },
     {
-        timestamps: true
+        timestamps: true,
+        toJSON: {
+            virtuals: true
+        },
     }
 );
 
+productSchema.virtual("offers", {
+    foreignField: "productId",
+    localField: "_id",
+    ref: "offers",
+});
 
 export default mongoose.model("products", productSchema);

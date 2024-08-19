@@ -1,17 +1,24 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import productRouter from './routes/product.route.js';
 import { connectToMongoDB } from './utils/database.js';
 import cookieParser from 'cookie-parser';
-import sellerRouter from './routes/sellers.route.js';
 import cors from 'cors';
-import userRouter from './routes/users.route.js';
-import wishlistRouter from './routes/wishlist.route.js';
-import orderRoutes from './routes/order.route.js';
+
+// import sellerRouter from './routes/sellers.route.js';
+// import userRouter from './routes/users.route.js';
+// import wishlistRouter from './routes/wishlist.route.js';
+// import orderRoutes from './routes/order.route.js';
+// import dashboardRoutes from './routes/dashboard.route.js';
+// import offerRouter from './routes/offer.route.js';
+// import productRouter from './routes/product.route.js';
+
 import orderStatusModel from './models/orders/order.status.model.js';
 import { ORDERSTATUS } from './models/orders/order-status.js';
 import { whiteListUrls } from './utils/whitelist-urls.js';
-import dashboardRoutes from './routes/dashboard.route.js';
+import { routerURLs } from './routes/index.route.js';
+
+
+
 dotenv.config();
 connectToMongoDB();
 
@@ -20,12 +27,7 @@ app.use(express.json());
 app.use(cors({ credentials: true, origin: whiteListUrls }));
 app.use(cookieParser());
 
-app.use('/api/product', productRouter);
-app.use('/api/seller', sellerRouter);
-app.use('/api/users', userRouter);
-app.use('/api/wishlist', wishlistRouter);
-app.use('/api/order', orderRoutes);
-app.use('/api/stats', dashboardRoutes);
+routerURLs(app);
 
 app.use((err, req, res, next) => {
     const statusCode = err?.status || 500;

@@ -31,7 +31,8 @@ export const dashboardStats = async (req, res, next) => {
             totalOrder: orderStats[0]?.count,
             totalOrderValue: orderStats[0]?.totalOrderValue,
             stocksOutage: productStockStats[0]?.count
-        }
+        };
+
         return next(createSuccess(200, '', finalStats));
     } catch (error) {
         return next(createError(500, 'Something went wrong!' + error));

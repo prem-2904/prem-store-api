@@ -1,5 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
+const OfferDetailSchema = new mongoose.Schema({
+    coupon: { type: String, required: true },
+    discount: { type: String, required: true },
+    couponId: { type: String, required: true }
+});
+
+
 const orderSchema = new mongoose.Schema(
     {
         _id: {
@@ -71,6 +78,10 @@ const orderSchema = new mongoose.Schema(
         orderAmountPaid: {
             type: String,
             required: true
+        },
+        offerDetails: {
+            type: Array,
+            default: []
         }
     },
     {

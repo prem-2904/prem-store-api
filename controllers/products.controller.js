@@ -101,13 +101,34 @@ export const getProducts = async (req, res, next) => {
     }
 }
 
+export const getSellersProductList = async (req, res, next) => {
+    try {
+        const sellerId = req.params?.sellerId;
+        const params = { isDeleted: false };
+        if (sellerId) {
+            params['sellerId'] = sellerId
+        }
+        const products = await productsModel.find(params).select("productName sellerId")
+        if (products) {
+            return next(createSuccess(200, '', products));
+        }
+        else {
+            return next(createError(404, 'No products found!', []));
+        }
+    } catch (error) {
+        return next(createError(500, 'Something went wrong with listing the products', []));
+    }
+}
+
 export const getProductDetails = async (req, res, next) => {
     try {
         const productId = req.params?.pid;
         const params = { isDeleted: false };
-        params['_id'] = productId
+        params['_id'] = productId;
+        const currentDateTime = new Date();
         const products = await productsModel.find(params).populate("availabilityStocks")
-            .populate({ path: "sellerId", select: "sellerName" });
+            .populate({ path: "sellerId", select: "sellerName" })
+            .populate({ path: 'offers', match: { dateOfExpiry: { $gte: new Date() } }, select: "couponName couponCode couponOfferType couponTerms dateOfExpiry minPurchase" });
         if (products) {
             return next(createSuccess(200, '', products));
         }
@@ -131,9 +152,11 @@ export const getStocks = async (req, res, next) => {
 
 export const userProducts = async (req, res, next) => {
     try {
+        console.log('new date', new Date())
         const products = await productsModel.find({ isAvailableForSale: true })
             .populate("availabilityStocks")
-            .populate({ path: 'sellerId', select: "sellerName" });
+            .populate({ path: 'sellerId', select: "sellerName" })
+        // .populate({ path: 'offers', match: { dateOfExpiry: { $gte: new Date() } }, select: "couponName couponCode couponOfferType couponTerms dateOfExpiry minPurchase" });
         if (products) {
             return next(createSuccess(200, '', products));
         }

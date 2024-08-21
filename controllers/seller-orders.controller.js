@@ -57,7 +57,7 @@ export const updateOrderStatus = async (req, res, next) => {
         } else if (updateOrderStatus._id === 'cancelled') {
             itemPayload['isCancelled'] = true;
         }
-        const itemsUpdateRes = await orderItemsModel.updateOne({ orderId: payload.id }, itemPayload);
+        const itemsUpdateRes = await orderItemsModel.updateOne({ orderId: payload.id }, { orderStatus: payload.order.orderStatus });
         const historyPayload = {
             orderId: payload.id,
             orderStatus: payload.orderHistory.nextStatus,

@@ -3,6 +3,7 @@ import productsModel from "../models/products.model.js";
 import { createError, createSuccess } from "../utils/response-structure.js";
 import stocksModel from '../models/product-stocks.model.js'
 import cartModel from "../models/cart.model.js";
+import { calculateAvg } from "./rating.controller.js";
 
 export const createProduct = async (req, res, next) => {
     try {
@@ -126,9 +127,13 @@ export const getProductDetails = async (req, res, next) => {
         const params = { isDeleted: false };
         params['_id'] = productId;
         const currentDateTime = new Date();
-        const products = await productsModel.find(params).populate("availabilityStocks")
+        let products = await productsModel.find(params).populate("availabilityStocks")
             .populate({ path: "sellerId", select: "sellerName" })
+            .populate('ratings')
             .populate({ path: 'offers', match: { dateOfExpiry: { $gte: new Date() } }, select: "couponName couponCode couponOfferType couponTerms dateOfExpiry minPurchase" });
+        const avgRatings = await calculateAvg(productId);
+        products.push(avgRatings);
+        console.log("ratings_svg", products)
         if (products) {
             return next(createSuccess(200, '', products));
         }

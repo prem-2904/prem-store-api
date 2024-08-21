@@ -48,4 +48,10 @@ productSchema.virtual("offers", {
     ref: "offers",
 });
 
+productSchema.virtual("ratings", {
+    foreignField: 'productId',
+    localField: '_id',
+    ref: 'ratings'
+})
+
 export default mongoose.model("products", productSchema);

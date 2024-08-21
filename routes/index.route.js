@@ -5,6 +5,7 @@ import orderRoutes from './order.route.js';
 import dashboardRoutes from './dashboard.route.js';
 import offerRouter from './offer.route.js';
 import productRouter from './product.route.js';
+import ratingRoutes from './rating.route.js';
 
 export const routerURLs = (app) => {
     try {
@@ -14,7 +15,8 @@ export const routerURLs = (app) => {
         app.use('/api/wishlist', wishlistRouter);
         app.use('/api/order', orderRoutes);
         app.use('/api/stats', dashboardRoutes);
-        app.use('/api/offers', offerRouter)
+        app.use('/api/offers', offerRouter);
+        app.use('/api/rating', ratingRoutes)
     } catch (error) {
         console.log("error", error)
     }
